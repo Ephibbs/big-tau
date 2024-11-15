@@ -186,7 +186,7 @@ Please note that this feature utilizes an LLM, which may lead to inaccurate erro
     Assist with account inquiries, provide transaction data, manage alerts, and offer guidance.
 
 18. **Engineering**  
-    Manage code repositories, review and merge pull requests, track project issues, automate testing, and document technical processes.
+    Manage code repositories, review and merge pull requests, track project issues, automate testing, and document technical processes, write unit tests, install dependencies, code across files.
 
 19. **Loans**  
     Process applications, verify criteria, answer inquiries, and manage payments.
@@ -211,7 +211,9 @@ Please note that this feature utilizes an LLM, which may lead to inaccurate erro
 
 26. **Data Science**
     Perform data cleaning and preprocessing, run statistical analyses, create visualizations, develop predictive models, and generate insights for decision-making.
-
+    
+28. **Web Automation**
+    Automate repetitive web tasks, extract data from websites, fill out and submit online forms, manage web scraping, schedule automated workflows, and monitor web activities for changes or updates.
 
 
 ## License
