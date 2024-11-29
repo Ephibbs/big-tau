@@ -86,6 +86,12 @@
     Automate repetitive web tasks, extract data from websites, fill out and submit online forms, manage web scraping, schedule automated workflows, and monitor web activities for changes or updates.
 
 
+## Historical trajectories
+
+τ-bench might be expensive to run. We have provided a set of historical trajectories for the airline and retail environments in `./historical_trajectories`.
+
+If you would like to contribute your historical trajectories to this benchmark, please submit a PR!
+
 ## License
 
 See `./LICENSE`.
