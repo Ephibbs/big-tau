@@ -5,8 +5,10 @@ import argparse
 from enum import Enum
 from pydantic import BaseModel
 from tau_bench.model_utils import default_api_from_args, API
-from tau_bench.envs.airline.tasks_test import TASKS as AIRLINE_TASKS
-from tau_bench.envs.retail.tasks_test import TASKS_TEST as RETAIL_TASKS
+from tau_bench.envs.airline.tasks_test import TASKS as AIRLINE_TASKS_TEST
+from tau_bench.envs.retail.tasks_test import TASKS_TEST as RETAIL_TASKS_TEST
+from tau_bench.envs.retail.tasks_train import TASKS_TRAIN as RETAIL_TASKS_TRAIN
+from tau_bench.envs.retail.tasks_dev import TASKS_DEV as RETAIL_TASKS_DEV
 from tau_bench.model_utils.args import api_parser
 from tau_bench.types import Task, Action
 from typing import List, Dict, Any
@@ -19,6 +21,13 @@ def get_args() -> argparse.Namespace:
     parser.add_argument("--max-concurrency", type=int, default=1, help="Maximum number of concurrent API calls")
     parser.add_argument("--output-path", type=str, required=True, help="Path to the output file")
     parser.add_argument("--max-num-failed-results", "-n", type=int, help="Maximum number of failed results to analyze")
+    parser.add_argument(
+        "--task-split",
+        type=str,
+        default="test",
+        choices=["train", "test", "dev"],
+        help="The split of tasks to run",
+    )
     return parser.parse_args()
 
 class OriginalResult(BaseModel):
@@ -37,12 +46,14 @@ class FaultAssignmentResult(BaseModel):
     task_id: int
     author: FaultAuthor
     description: str
+    faulty_message: str
 
     def model_dump(self) -> Dict[str, Any]:
         return {
             "task_id": self.task_id,
             "author": self.author.value,
             "description": self.description,
+            "faulty_message": self.faulty_message,
         }
 
 class FaultType(Enum):
@@ -127,12 +138,17 @@ def fault_assignment_analysis(api: API, results: List[OriginalResult], max_concu
             text=context,
             options=["The user", "The agent", "The environment (neither user nor agent)"],
         )
+        faulty_message = api.generate(
+            instruction=f"{ctx_desc}\n\nWrite word for word the message where the fault begins.",
+            text=context,
+        )
+        print(faulty_message)
         author = idx_to_author[res]
         description = api.generate(
             instruction=f"{ctx_desc}\n\nDescribe the reason why {author.value} is responsible for the fault in the trajectory. Be concise and only focus on the functional differences between the ground truth and the trajectory.",
             text=context,
         )
-        return FaultAssignmentResult(task_id=task_id, author=author, description=description)
+        return FaultAssignmentResult(task_id=task_id, author=author, description=description, faulty_message=faulty_message)
     with ThreadPoolExecutor(max_workers=max_concurrency) as executor:
         task_ids = [r.task_id for r in results]
         user_instructions = [r.user_instruction for r in results]
@@ -182,9 +198,15 @@ def main() -> None:
     print(f"Loaded {len(results)} results")
     env = args.env
     if env == "airline":
-        tasks: List[Task] = AIRLINE_TASKS
+        tasks: List[Task] = {
+            "test": AIRLINE_TASKS_TEST,
+        }[args.task_split]
     elif env == "retail":
-        tasks: List[Task] = RETAIL_TASKS
+        tasks: List[Task] = {
+            "test": RETAIL_TASKS_TEST,
+            "train": RETAIL_TASKS_TRAIN,
+            "dev": RETAIL_TASKS_DEV,
+        }[args.task_split]
     else:
         raise ValueError(f"Invalid environment: {env}")
     failed_results = [r for r in results if r["reward"] <= 1e-3]

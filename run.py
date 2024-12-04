@@ -113,6 +113,12 @@ def agent_factory(
     if args.agent_strategy == "tool-calling":
         # native tool calling
         from tau_bench.agents.tool_calling_agent import ToolCallingAgent
+        import json
+        
+        # save tools info for debugging
+        tools_path = os.path.join("tools.json")
+        with open(tools_path, "w") as f:
+            json.dump(tools_info, f, indent=2)
 
         return ToolCallingAgent(
             tools_info=tools_info,
