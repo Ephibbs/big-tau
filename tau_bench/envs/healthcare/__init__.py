@@ -1,3 +1,3 @@
 # Copyright Sierra
 
-from tau_bench.envs.healthcare.env import MockHealthcareDomainEnv as MockHealthcareDomainEnv
+from tau_bench.envs.healthcare.env import MockHealthcareDomainEnv

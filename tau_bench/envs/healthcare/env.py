@@ -20,7 +20,11 @@ class MockHealthcareDomainEnv(Env):
     ):
         match task_split:
             case "test":
-                from tau_bench.envs.healthcare.tasks_test import TASKS as tasks
+                from tau_bench.envs.healthcare.tasks_test import TASKS_TEST as tasks
+            case "train":
+                from tau_bench.envs.healthcare.tasks_train import TASKS_TRAIN as tasks
+            case "dev":
+                from tau_bench.envs.healthcare.tasks_dev import TASKS_DEV as tasks
             case _:
                 raise ValueError(f"Unknown task split: {task_split}")
         super().__init__(
