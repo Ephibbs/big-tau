@@ -1,0 +1,9 @@
+unsloth
+wandb
+huggingface-hub
+torch
+transformers
+datasets
+trl
+dotenv
+

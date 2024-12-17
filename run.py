@@ -16,7 +16,8 @@ from tau_bench.agents.base import Agent
 from tau_bench.types import EnvRunResult
 from litellm import provider_list
 from tau_bench.envs.user import UserStrategy
-
+from dotenv import load_dotenv
+load_dotenv()
 
 def run(
     args: argparse.Namespace,
@@ -261,7 +262,7 @@ def main():
     random.seed(args.seed)
 
     time_str = datetime.now().strftime("%m%d%H%M%S")
-    file_str = f"{args.log_dir}/{args.agent_strategy}-{args.model.split('/')[-1]}-{args.temperature}_range_{args.start_index}-{args.end_index}_user-{args.user_model}-{args.user_strategy}_{time_str}.json"
+    file_str = f"{args.log_dir}/{args.agent_strategy}-{args.model.split('/')[-1]}-{args.temperature}_range_{args.start_index}-{args.end_index}_user-{args.user_model.split('/')[-1]}-{args.user_strategy}_{time_str}.json"
 
     if not os.path.exists(args.log_dir):
         os.makedirs(args.log_dir)

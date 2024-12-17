@@ -8,6 +8,7 @@ from tau_bench.agents.base import Agent
 from tau_bench.envs.base import Env
 from tau_bench.types import SolveResult, Action, RESPOND_ACTION_NAME
 
+from openai import OpenAI
 
 class ToolCallingAgent(Agent):
     def __init__(
@@ -20,9 +21,25 @@ class ToolCallingAgent(Agent):
     ):
         self.tools_info = tools_info
         self.wiki = wiki
-        self.model = model
         self.provider = provider
         self.temperature = temperature
+        if model.split('/')[0] == "runpod":
+            base_key = model.split('/')[1]
+            api_key = model.split('/')[2]
+            # self.model = '/'.join(["openai"] + model.split('/')[3:])
+            self.model = '/'.join(model.split('/')[3:])
+            print(f"Using RunPod model: {self.model}")
+            # api_base = f"https://api.runpod.ai/v2/{base_key}/openai/v1"
+            api_base = f"https://{base_key}-8000.proxy.runpod.net/v1"
+            client = OpenAI(
+                api_key=api_key,
+                # base_url=f"https://api.runpod.ai/v2/u5sbppefoz2g7l/openai/v1",
+                base_url=api_base,
+            )
+            self.completion = client.chat.completions.create
+        else:
+            self.model = model
+            self.completion = completion
 
     def solve(
         self, env: Env, task_index: Optional[int] = None, max_num_steps: int = 30
@@ -37,15 +54,22 @@ class ToolCallingAgent(Agent):
             {"role": "user", "content": obs},
         ]
         for _ in range(max_num_steps):
-            res = completion(
+            # print("Current messages:")
+            print(f"User: {messages[-1]}\n")
+            res = self.completion(
                 messages=messages,
                 model=self.model,
-                custom_llm_provider=self.provider,
+                # custom_llm_provider=self.provider,
                 tools=self.tools_info,
+                tool_choice="auto",
                 temperature=self.temperature,
             )
             next_message = res.choices[0].message.model_dump()
-            total_cost += res._hidden_params.get("response_cost") or 0.0
+            print(f"Assistant: {next_message}\n")
+            if not hasattr(res, '_hidden_params'):
+                total_cost += 0.0
+            else:
+                total_cost += res._hidden_params.get("response_cost") or 0.0
             action = message_to_action(next_message)
             env_response = env.step(action)
             reward = env_response.reward

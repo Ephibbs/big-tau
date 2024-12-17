@@ -13,6 +13,9 @@ from tau_bench.model_utils.args import api_parser
 from tau_bench.types import Task, Action
 from typing import List, Dict, Any
 from concurrent.futures import ThreadPoolExecutor
+from dotenv import load_dotenv
+load_dotenv()
+
 
 def get_args() -> argparse.Namespace:
     parser = api_parser()
@@ -93,7 +96,8 @@ def context_description(grading_strategy: GradingStrategy) -> str:
 
 def display_traj(traj: List[Dict[str, Any]]) -> str:
     if len(traj) == 0:
-        raise ValueError("Trajectory is empty")
+        # raise ValueError("Trajectory is empty")
+        return ""
     stripped_traj = [item for item in traj if item["role"] != "system"]
     return "\n".join([f"{item['role'].capitalize()}: {item['content']}" for item in stripped_traj])
 
