@@ -38,16 +38,23 @@ def generate_openai_object(prompt, schema, model="o1-mini", max_tokens=None, tem
 # 1. Generate System Prompt (Agent Responsibilities and Policies)
 def create_system_prompt(description: str, env_dir: str, model: str = "o1-mini") -> str:
     prompt = generate_openai_object(
-        f"Write a detailed, formatted markdown document for an agent's responsibilities and policies in an environment fitting the following description:\n\n{description}\n\nInclude examples and guidelines. Only write what a text-based agent with function-calling capabilities could do, not what a human could do. Do not include function descriptions, just the general guidelines and responsibilities. Do not include a table of contents.",
+        f"Write a detailed, formatted markdown document for an agent's responsibilities and policies in an environment fitting the following description:\n\n{description}\n\nInclude examples and guidelines. In addition, include a list of variables that should be supplied to the agent and will be appended to the agent's prompt(e.g. 'datetime', 'user_id', etc.). Only include variables that are necessary to support the task categories and system prompt. Only write what a text-based agent with function-calling capabilities could do, not what a human could do. Do not include function descriptions, just the general guidelines and responsibilities. Do not include a table of contents.",
         {
             "name": "wiki",
             "schema": {
                 "type": "object",
                 "properties": {
-                    "content": {"type": "string"}
-                },
-                "required": ["content"]
-            }
+                    "content": {"type": "string"},
+                    "variables": {
+                        "type": "array",
+                        "description": "A list of variables that should be supplied to the agent and will be appended to the agent's prompt.",
+                        "items": {
+                            "type": "string", "description": "The name of the variable."
+                        },
+                    }
+                }
+            },
+            "required": ["content"]
         },
         model=model
     )
@@ -131,13 +138,13 @@ Return a list of complete function schemas in JSON Schema format."""
         json.dump(functions['functions'], file, indent=4)
     return functions
 
-# 3. Generate Database Schemas
-def create_mock_databases(env_dir: str, model: str = "o1-mini") -> Dict[str, Any]:
-    task_categories = json.load(open(f"{env_dir}/task_categories.json", "r"))
+# 3. Generate Function Response Schemas
+def create_function_response_schemas(env_dir: str, model: str = "o1-mini") -> Dict[str, Any]:
+    functions = json.load(open(f"{env_dir}/functions_schemas.json", "r"))
     system_prompt = open(f"{env_dir}/wiki.md", "r").read()
-    db_prompt = "Design database schemas for a system supporting the following task categories: " + ", ".join(task_categories) + " as well as the following system prompt: " + system_prompt + ". Include data for users, events, or other necessary entities. Only include tables that are necessary to support the task categories and system prompt. Provide schemas in JSON format. Make the tables document-based, not relational."
+    db_prompt = "Design response schemas for a system supporting the following functions to call: " + ", ".join(functions) + " as well as the following system prompt: " + system_prompt + ". Provide schemas in JSON format. Create a schema for each function."
     db_schemas = generate_openai_object(db_prompt, {
-        "name": "database_schemas",
+        "name": "function_response_schemas",
         "schema": {
             "type": "object",
             "properties": {
@@ -146,10 +153,10 @@ def create_mock_databases(env_dir: str, model: str = "o1-mini") -> Dict[str, Any
                     "items": {
                         "type": "object",
                         "properties": {
-                            "name": {"type": "string"},
+                            "table_name": {"type": "string"},
                             "schema": {"type": "object"}
                         },
-                        "required": ["name", "schema"]
+                        "required": ["table_name", "schema"]
                     }
                 }
             },
@@ -301,8 +308,8 @@ def create(name: str, description: str, num_tasks: int, num_categories: int, out
     steps = [
         ('System Prompt', lambda: create_system_prompt(description, env_dir, model=model)),
         ('Task Categories', lambda: create_task_categories(env_dir, num_categories, model=model)),
-        ('Database Schemas', lambda: create_mock_databases(env_dir, model=model)),
         ('Functions', lambda: create_functions(env_dir, model=model)),
+        ('Database Schemas', lambda: create_function_response_schemas(env_dir, model=model)),
         ('Edge Cases', lambda: create_edge_cases(env_dir, model=model)),
         ('Users and Tasks', lambda: create_users_and_tasks(env_dir, num_tasks))
     ]
