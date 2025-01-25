@@ -1,0 +1,405 @@
+[
+    {
+        "name": "schedule_appointment",
+        "description": "Schedules a new appointment or follow-up for a patient in the hospital's system.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "patient_id": {
+                    "type": "string",
+                    "description": "Unique identifier for the patient."
+                },
+                "appointment_date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Date of the appointment."
+                },
+                "appointment_time": {
+                    "type": "string",
+                    "format": "time",
+                    "description": "Time of the appointment."
+                },
+                "department": {
+                    "type": "string",
+                    "description": "Hospital department where the appointment is scheduled."
+                },
+                "doctor_id": {
+                    "type": "string",
+                    "description": "Unique identifier for the doctor."
+                }
+            },
+            "required": [
+                "patient_id",
+                "appointment_date",
+                "appointment_time",
+                "department",
+                "doctor_id"
+            ]
+        },
+        "output": {
+            "type": "object",
+            "properties": {
+                "confirmation_number": {
+                    "type": "string",
+                    "description": "Unique confirmation number for the scheduled appointment."
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "success",
+                        "failure"
+                    ],
+                    "description": "Status of the scheduling operation."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Additional information regarding the operation status."
+                }
+            }
+        },
+        "constraints": [
+            "Patient ID must exist in the hospital's database.",
+            "Appointment date and time must be within the hospital's operating hours."
+        ]
+    },
+    {
+        "name": "update_patient_information",
+        "description": "Updates contact and insurance information for an existing patient.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "patient_id": {
+                    "type": "string",
+                    "description": "Unique identifier for the patient."
+                },
+                "contact_info": {
+                    "type": "object",
+                    "properties": {
+                        "phone": {
+                            "type": "string",
+                            "description": "Patient's phone number."
+                        },
+                        "email": {
+                            "type": "string",
+                            "description": "Patient's email address."
+                        }
+                    },
+                    "required": [
+                        "phone",
+                        "email"
+                    ],
+                    "description": "Patient's contact information."
+                },
+                "insurance_info": {
+                    "type": "object",
+                    "properties": {
+                        "insurance_provider": {
+                            "type": "string",
+                            "description": "Name of the insurance provider."
+                        },
+                        "policy_number": {
+                            "type": "string",
+                            "description": "Insurance policy number."
+                        }
+                    },
+                    "required": [
+                        "insurance_provider",
+                        "policy_number"
+                    ],
+                    "description": "Patient's insurance information."
+                }
+            },
+            "required": [
+                "patient_id",
+                "contact_info",
+                "insurance_info"
+            ]
+        },
+        "output": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "success",
+                        "failure"
+                    ],
+                    "description": "Status of the update operation."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Additional information regarding the operation status."
+                }
+            }
+        },
+        "constraints": [
+            "Patient ID must exist in the hospital's database.",
+            "Contact information must follow standard formats for phone and email."
+        ]
+    },
+    {
+        "name": "verify_patient_identity",
+        "description": "Verifies the identity of a patient for secure access to their information or services.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "patient_id": {
+                    "type": "string",
+                    "description": "Unique identifier for the patient."
+                },
+                "verification_method": {
+                    "type": "string",
+                    "enum": [
+                        "password",
+                        "security_question",
+                        "biometric"
+                    ],
+                    "description": "Method used for patient identity verification."
+                },
+                "verification_data": {
+                    "type": "string",
+                    "description": "Data required for the selected verification method (e.g., password, answer to security question)."
+                }
+            },
+            "required": [
+                "patient_id",
+                "verification_method",
+                "verification_data"
+            ]
+        },
+        "output": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "verified",
+                        "unverified"
+                    ],
+                    "description": "Verification status of the patient identity."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Additional information regarding the verification process."
+                }
+            }
+        },
+        "constraints": [
+            "Patient ID must exist in the hospital's database.",
+            "Verification data must match the records."
+        ]
+    },
+    {
+        "name": "issue_visitor_pass",
+        "description": "Issues a temporary visitor pass for individuals visiting patients in the hospital.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "visitor_name": {
+                    "type": "string",
+                    "description": "Name of the visitor."
+                },
+                "patient_id": {
+                    "type": "string",
+                    "description": "Unique identifier for the patient being visited."
+                },
+                "visit_date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Date of the visit."
+                }
+            },
+            "required": [
+                "visitor_name",
+                "patient_id",
+                "visit_date"
+            ]
+        },
+        "output": {
+            "type": "object",
+            "properties": {
+                "pass_id": {
+                    "type": "string",
+                    "description": "Unique identifier for the issued visitor pass."
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "success",
+                        "failure"
+                    ],
+                    "description": "Status of the pass issuance."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Additional information regarding the operation status."
+                }
+            }
+        },
+        "constraints": [
+            "Patient ID must exist in the hospital's database.",
+            "Visit date must be within allowed visiting hours."
+        ]
+    },
+    {
+        "name": "escalate_emergency",
+        "description": "Escalates emergency situations to the appropriate medical staff or emergency services.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "emergency_code": {
+                    "type": "string",
+                    "description": "Code or description of the detected emergency situation."
+                },
+                "location": {
+                    "type": "string",
+                    "description": "Location within the hospital where the emergency is occurring."
+                },
+                "reporter_id": {
+                    "type": "string",
+                    "description": "Unique identifier for the individual reporting the emergency."
+                }
+            },
+            "required": [
+                "emergency_code",
+                "location",
+                "reporter_id"
+            ]
+        },
+        "output": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "escalated",
+                        "failed"
+                    ],
+                    "description": "Status of the emergency escalation process."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Additional details about the escalation outcome."
+                }
+            }
+        },
+        "constraints": [
+            "Emergency code must be a recognized code within hospital protocols.",
+            "Location must be a valid hospital location."
+        ]
+    },
+    {
+        "name": "collect_patient_feedback",
+        "description": "Distributes and collects feedback from patients and visitors through satisfaction surveys.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "survey_type": {
+                    "type": "string",
+                    "enum": [
+                        "patient",
+                        "visitor"
+                    ],
+                    "description": "Type of survey to be distributed."
+                },
+                "recipient_id": {
+                    "type": "string",
+                    "description": "Unique identifier for the survey recipient."
+                },
+                "distribution_method": {
+                    "type": "string",
+                    "enum": [
+                        "email",
+                        "sms"
+                    ],
+                    "description": "Method of survey distribution."
+                }
+            },
+            "required": [
+                "survey_type",
+                "recipient_id",
+                "distribution_method"
+            ]
+        },
+        "output": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "distributed",
+                        "failed"
+                    ],
+                    "description": "Status of the survey distribution process."
+                },
+                "response_data": {
+                    "type": "object",
+                    "properties": {
+                        "total_responses": {
+                            "type": "integer",
+                            "description": "Total number of responses received."
+                        },
+                        "average_rating": {
+                            "type": "number",
+                            "description": "Average rating calculated from feedback."
+                        }
+                    }
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Additional details about survey distribution and response."
+                }
+            }
+        },
+        "constraints": [
+            "Recipient ID must be a valid patient or visitor ID.",
+            "Distribution method must be supported by hospital systems."
+        ]
+    },
+    {
+        "name": "provide_hospital_directions",
+        "description": "Provides directions to specific departments or areas within the hospital.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "current_location": {
+                    "type": "string",
+                    "description": "Current location of the individual requesting directions."
+                },
+                "destination": {
+                    "type": "string",
+                    "description": "Desired department or area within the hospital."
+                }
+            },
+            "required": [
+                "current_location",
+                "destination"
+            ]
+        },
+        "output": {
+            "type": "object",
+            "properties": {
+                "directions": {
+                    "type": "string",
+                    "description": "Text-based directions from current location to destination."
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "success",
+                        "failure"
+                    ],
+                    "description": "Success status of providing directions."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Additional information regarding the operation."
+                }
+            }
+        },
+        "constraints": [
+            "Current location and destination must be valid hospital locations.",
+            "Directions must conform to hospital's accessibility guidelines."
+        ]
+    }
+]

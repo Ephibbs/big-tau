@@ -1,0 +1,96 @@
+# Input prompt for the test data generator
+prompt: |
+  An AI assistant in a retail environment.
+  Focus on common customer service scenarios including product inquiries, order status checks,
+  returns processing, and inventory questions. Include both straightforward and edge cases.
+
+# Function schemas available to the agent
+function_schemas:
+  - name: check_inventory
+    description: Check current inventory levels for a product
+    parameters:
+      product_id: string
+      store_location: string
+    returns: 
+      type: object
+      properties:
+        quantity: integer
+        status: string
+
+  - name: process_return
+    description: Process a product return request
+    parameters:
+      order_id: string
+      items:
+        type: array
+        items:
+          type: object
+          properties:
+            product_id: string
+            quantity: integer
+            reason: string
+    returns:
+      type: object
+      properties:
+        return_id: string
+        status: string
+
+  - name: check_order_status
+    description: Get the current status of an order
+    parameters:
+      order_id: string
+    returns:
+      type: object
+      properties:
+        status: string
+        estimated_delivery: string
+
+# User personas to simulate
+users:
+  - type: regular_customer
+    description: "Frequent shopper who knows the store's policies"
+  - type: new_customer 
+    description: "First-time customer needing more guidance"
+  - type: frustrated_customer
+    description: "Customer with complaints or issues to resolve"
+  - type: international_customer
+    description: "Customer shopping from abroad with shipping/currency questions"
+  - type: elderly_customer
+    description: "Senior customer who may need extra assistance with technology"
+  - type: business_customer
+    description: "Corporate buyer making bulk purchases"
+  - type: price_sensitive_customer
+    description: "Customer focused on deals and discounts"
+  - type: tech_savvy_customer
+    description: "Customer who prefers self-service and digital solutions"
+  - type: indecisive_customer
+    description: "Customer who needs help making purchase decisions"
+  - type: scam_customer
+    description: "Customer who is trying to scam the store"
+
+# Types of tasks to generate conversations for
+task_types:
+  - inventory_check
+  - return_processing
+  - order_status
+  - product_information
+  - complaint_handling
+
+# Number of test conversations to generate
+num_conversations: 50
+
+# Model configuration for generation
+model:
+  name: gpt-4o
+  provider: openai
+  temperature: 0.7
+  max_tokens: 1000
+  
+# Test suite parameters
+test_params:
+  include_edge_cases: true
+  max_turns_per_conversation: 10
+  success_criteria:
+    - task_completion
+    - policy_adherence
+    - user_satisfaction

@@ -1,5 +1,6 @@
 import os
 import json
+import yaml
 import random
 from faker import Faker
 import openai
@@ -269,8 +270,21 @@ def cli():
               help='Only generate the specified step (1-6).')
 @click.option('--model', '-m', default="gpt-4o", show_default=True,
               help='OpenAI model to use for generation')
-def create(name: str, description: str, num_tasks: int, num_categories: int, output_dir: str, stop_after: int, only_step: int, model: str):
+@click.option('--test-suite-params', '-ts',
+              help='YAML file containing test suite parameters')
+def create(name: str, description: str, num_tasks: int, num_categories: int, output_dir: str, stop_after: int, only_step: int, model: str, test_suite_params: str):
     """Create a new environment with the specified configuration."""
+    if test_suite_params:
+        test_suite_params = yaml.safe_load(open(test_suite_params, "r"))
+        name = test_suite_params["name"]
+        description = test_suite_params["description"]
+        num_tasks = test_suite_params["num_tasks"]
+        num_categories = test_suite_params["num_categories"]
+        output_dir = test_suite_params["output_dir"]
+        stop_after = test_suite_params["stop_after"]
+        only_step = test_suite_params["only_step"]
+        model = test_suite_params["model"]
+        test_suite_params = test_suite_params["test_suite_params"]
     if stop_after and not 1 <= stop_after <= 6:
         click.echo(click.style(f"Error: --stop-after must be between 1 and 6", fg='red'))
         return

@@ -3,9 +3,9 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="tau_bench",
+    name="taurus",
     version="0.1.0",
-    description="The Tau-Bench package",
+    description="The Taurus package",
     long_description=open("README.md").read(),
     packages=find_packages(),
     include_package_data=True,

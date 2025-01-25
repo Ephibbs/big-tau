@@ -29,8 +29,8 @@ class ToolCallingAgent(Agent):
             # self.model = '/'.join(["openai"] + model.split('/')[3:])
             self.model = '/'.join(model.split('/')[3:])
             print(f"Using RunPod model: {self.model}")
-            # api_base = f"https://api.runpod.ai/v2/{base_key}/openai/v1"
-            api_base = f"https://{base_key}-8000.proxy.runpod.net/v1"
+            api_base = f"https://api.runpod.ai/v2/{base_key}/openai/v1"
+            # api_base = f"https://{base_key}-8000.proxy.runpod.net/v1"
             client = OpenAI(
                 api_key=api_key,
                 # base_url=f"https://api.runpod.ai/v2/u5sbppefoz2g7l/openai/v1",

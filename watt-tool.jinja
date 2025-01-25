@@ -1,0 +1,86 @@
+{{ '<|begin_of_text|>' }}
+
+{% if messages[0]['role'] == 'system' %}
+    {% set loop_messages = messages[1:] %}
+    {% set system_message = messages[0]['content'] %}
+{% else %}
+    {% set loop_messages = messages %}
+{% endif %}
+
+{% if system_message is defined %}
+    {{ '<|start_header_id|>system<|end_header_id|>\n\n' }}
+    {{- system_message }}
+    {% if tools is defined %}
+        {{- "\n\n" }}
+        {{- "Here is a list of functions in JSON format that you can invoke.\n" }}
+        {%- for t in tools %}
+            {{- t | tojson(indent=4) }}
+            {{- "\n\n" }}
+        {%- endfor %}
+        {{- "\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)]\nYou SHOULD NOT include any other text in the response. "}}
+    {% endif %}
+    {{- "<|eot_id|>" }}
+{% endif %}
+
+{% for message in loop_messages %}
+    {% set content = message['content'] %}
+    {%- if message['role'] == 'user' %}
+        {{- '<|start_header_id|>user<|end_header_id|>\n\n' + content + '<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n' }}
+    {%- elif message['role'] == 'assistant' %}
+        {{- content | trim }}
+        {{- "<|eot_id|>" }}
+    {%- elif message.role == "tool" or message.role == "ipython" %}
+        {{- "<|start_header_id|>ipython<|end_header_id|>\n\n" }}
+        {%- if message.content is mapping or message.content is iterable %}
+            {{- message.content | tojson }}
+        {%- else %}
+            {{- message.content }}
+        {%- endif %}
+        {{- "<|eot_id|>" }}
+    {%- endif %}
+{% endfor %}
+
+
+
+
+
+The below one works on VLLM on runpod!!!
+{{ '<|begin_of_text|>' }}
+{% if messages[0]['role'] == 'system' %}
+    {% set loop_messages = messages[1:] %}
+    {% set system_message = messages[0]['content'] %}
+{% else %}
+    {% set loop_messages = messages %}
+{% endif %}
+
+{% if system_message is defined %}
+    {{ '<|start_header_id|>system<|end_header_id|>\n\n' + system_message }}
+    {% if tools is defined %}
+        {{ '\n\n' }}
+        {{ 'Here is a list of functions in JSON format that you can invoke.\n' }}
+        {% for t in tools %}
+            {{ t | tojson(indent=4) }}
+            {{ '\n\n' }}
+        {% endfor %}
+        {{ '\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)]\nYou SHOULD NOT include any other text in the response if you are invoking a function. Be a problem solver. If you need additional information, ask the user for it. Do not make up information.'}}
+    {% endif %}
+    {{ '<|eot_id|>' }}
+{% endif %}
+
+{% for message in loop_messages %}
+    {% set content = message['content'] %}
+    {% if message['role'] == 'user' %}
+        {{ '<|start_header_id|>user<|end_header_id|>\n\n' + content + '<|eot_id|>' }}
+    {% elif message['role'] == 'assistant' %}
+        {{ '<|start_header_id|>assistant<|end_header_id|>\n\n' + content + '<|eot_id|>' }}
+    {% elif message.role == 'tool' or message.role == 'ipython' %}
+        {{ '<|start_header_id|>ipython<|end_header_id|>\n\n' }}
+        {% if message.content is mapping or message.content is iterable %}
+            {{ message.content | tojson }}
+        {% else %}
+            {{ message.content }}
+        {% endif %}
+        {{ '<|eot_id|>' }}
+    {% endif %}
+{% endfor %}
+{{ '<|start_header_id|>assistant<|end_header_id|>\n\n' }}

@@ -1,0 +1,170 @@
+{
+    "tables": [
+        {
+            "name": "Users",
+            "schema": {
+                "user_id": "string",
+                "name": "string",
+                "contact_details": {
+                    "phone": "string",
+                    "email": "string",
+                    "address": "string"
+                },
+                "insurance_details": {
+                    "provider": "string",
+                    "policy_number": "string"
+                },
+                "identity_verified": "boolean",
+                "roles": [
+                    "string"
+                ],
+                "language_preference": "string",
+                "emergency_contact": {
+                    "name": "string",
+                    "phone": "string"
+                },
+                "notes": [
+                    "string"
+                ]
+            }
+        },
+        {
+            "name": "Appointments",
+            "schema": {
+                "appointment_id": "string",
+                "patient_id": "string",
+                "doctor_id": "string",
+                "date_time": "datetime",
+                "location": "string",
+                "status": "string",
+                "reminder_sent": "boolean",
+                "follow_up_scheduled": "boolean"
+            }
+        },
+        {
+            "name": "VisitorPasses",
+            "schema": {
+                "pass_id": "string",
+                "visitor_name": "string",
+                "visitor_phone": "string",
+                "visit_date": "datetime",
+                "patient_id": "string",
+                "pass_status": "string",
+                "notes": [
+                    "string"
+                ]
+            }
+        },
+        {
+            "name": "EmergencyAlerts",
+            "schema": {
+                "alert_id": "string",
+                "patient_id": "string",
+                "alert_type": "string",
+                "description": "string",
+                "date_time": "datetime",
+                "status": "string",
+                "escalated_to": "string"
+            }
+        },
+        {
+            "name": "Surveys",
+            "schema": {
+                "survey_id": "string",
+                "patient_id": "string",
+                "date_sent": "datetime",
+                "responses": {
+                    "question_id": "string",
+                    "response": "string"
+                },
+                "completion_status": "string",
+                "feedback_notes": [
+                    "string"
+                ]
+            }
+        },
+        {
+            "name": "Messages",
+            "schema": {
+                "message_id": "string",
+                "sender_id": "string",
+                "receiver_id": "string",
+                "content": "string",
+                "date_time": "datetime",
+                "status": "string"
+            }
+        },
+        {
+            "name": "ParkingAvailability",
+            "schema": {
+                "parking_id": "string",
+                "location": "string",
+                "available_spots": "integer",
+                "updated_at": "datetime"
+            }
+        },
+        {
+            "name": "HospitalPolicies",
+            "schema": {
+                "policy_id": "string",
+                "title": "string",
+                "description": "string",
+                "effective_date": "datetime",
+                "last_updated": "datetime"
+            }
+        },
+        {
+            "name": "Departments",
+            "schema": {
+                "department_id": "string",
+                "name": "string",
+                "location": "string",
+                "contact_number": "string"
+            }
+        },
+        {
+            "name": "SecurityAlerts",
+            "schema": {
+                "alert_id": "string",
+                "description": "string",
+                "date_time": "datetime",
+                "reported_by": "string",
+                "status": "string"
+            }
+        },
+        {
+            "name": "InterpretationServices",
+            "schema": {
+                "service_id": "string",
+                "language": "string",
+                "available": "boolean",
+                "contact_person": {
+                    "name": "string",
+                    "phone": "string"
+                },
+                "notes": [
+                    "string"
+                ]
+            }
+        },
+        {
+            "name": "HospitalAmenities",
+            "schema": {
+                "amenity_id": "string",
+                "name": "string",
+                "description": "string",
+                "location": "string"
+            }
+        },
+        {
+            "name": "PatientFeedback",
+            "schema": {
+                "feedback_id": "string",
+                "patient_id": "string",
+                "comments": "string",
+                "rating": "integer",
+                "date_time": "datetime"
+            }
+        }
+    ]
+}
